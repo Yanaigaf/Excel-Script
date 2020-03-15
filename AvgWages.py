@@ -1,7 +1,6 @@
+import openpyxl
 import requests
 import xlrd
-import openpyxl
-
 
 URL_S = 'https://old.cbs.gov.il/archive/'
 URL_E = '/y_labor/e1_06.xls'
@@ -49,9 +48,7 @@ def save_data(filename):
                     while not dataws.col(DATACOL)[rowindex-1].value:
                         rowindex -= 1
                     data_to_write.append(dataws.col(DATACOL)[rowindex-1].value)
-    print(data_to_write)
     ws.append(headers)
-    ws.form
     ws.append(data_to_write)
     wb.save(filename)
 
