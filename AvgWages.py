@@ -44,8 +44,8 @@ def download_files():
         print("Program will ask overwrite permission per file")
         ask_overwrite = True
     dates_to_remove = []
-    for date in dates:
-        filename = date + '.xls'
+    for d in dates:
+        filename = d + '.xls'
         if Path(filename).exists():
             if ask_overwrite:
                 overwrite = input(f"File {filename} already exists. Overwrite? [Y/N]\n").upper()
@@ -56,33 +56,33 @@ def download_files():
             elif not overwrite_all:
                 print(f"File {filename} already exists. Skipping...\n")
                 continue
-        url = URL.format(date)
+        url = URL.format(d)
         response = get_response(url)
         if response.apparent_encoding == 'ascii':
-            print(f"File for date {date} does not exist on the server. Skipping...")
-            dates_to_remove.append(date)
+            print(f"File for date {d} does not exist on the server. Skipping...")
+            dates_to_remove.append(d)
         else:
             if response.content:
                 with open(filename, 'wb') as f:
                     f.write(response.content)
-    for date in dates_to_remove:
-        dates.remove(date)
+    for d in dates_to_remove:
+        dates.remove(d)
 
 
 def save_data(outfile='Results'):
-    _datacolumn=22
+    _datacolumn = 22
     outfile += '.xlsx'
     data_to_write = []
     wb = openpyxl.Workbook()
     ws = wb.active
-    for date in dates:
+    for d in dates:
         try:
-            dataws = xlrd.open_workbook(date + '.xls').sheet_by_index(0)
+            dataws = xlrd.open_workbook(d + '.xls').sheet_by_index(0)
         except:
-            print(f"Cannot read file {date}.xls. Skipping...")
+            print(f"Cannot read file {d}.xls. Skipping...")
             continue
         datacell = list(filter(lambda x: x[1].value == 'מדדים ', enumerate(dataws.col(_datacolumn))))[0]
-        rowindex = datacell[0]-1
+        rowindex = datacell[0] - 1
         while not dataws.col(_datacolumn)[rowindex].value:
             rowindex -= 1
         data = dataws.col(_datacolumn)[rowindex].value
@@ -116,7 +116,7 @@ def get_dates():
         print("CBS does not hold future data. Changing ending date to today")
         end_year = year_now
         end_month = month_now
-    years = list(range(start_year, end_year+1))
+    years = list(range(start_year, end_year + 1))
     if len(years) == 1:
         dates = list(map(lambda x: str(start_year) + str(x).zfill(2), range(start_month, end_month + 1)))
     else:
@@ -124,7 +124,7 @@ def get_dates():
             if year == start_year:
                 dates = list(map(lambda x: str(year) + str(x).zfill(2), range(start_month, 13)))
             elif year == end_year:
-                dates.extend(list(map(lambda x: str(year) + str(x).zfill(2), range(1, end_month+1))))
+                dates.extend(list(map(lambda x: str(year) + str(x).zfill(2), range(1, end_month + 1))))
             else:
                 dates.extend(list(map(lambda x: str(year) + str(x).zfill(2), range(1, 13))))
     return dates
